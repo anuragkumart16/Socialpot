@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-o2od&tavpe5&b!hmd2p!q46u-a*)i)!b7f684)xhrqokk8me+j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['http://127.0.0.1:8000/','127.0.0.1:8000','127.0.0.1','[::1]','socialpot/pythonanywhere.com','https://socialpot/pythonanywhere.com']
+ALLOWED_HOSTS = ['http://127.0.0.1:8000/','127.0.0.1:8000','127.0.0.1','[::1]','socialpot.pythonanywhere.com','https://socialpot/pythonanywhere.com']
 
 
 # Application definition
