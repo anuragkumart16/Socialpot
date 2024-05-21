@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Clip Board</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+        * {
+            margin: 0px 0px;
+            padding: 0px 0px;
+            box-sizing: border-box;
+        }
+
+        body {
+            /* align-items: center; */
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+        }
+
+        .container {
+            margin: 20px 0px;
+            padding: 30px 30px;
+            box-shadow: 0px 0px 1px 0px green;
+
+        }
+
+        .container h1 {
+            font-family: "Roboto", sans-serif;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+
+        li {
+            flex-direction: column;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 10px;
+            border-bottom: 1px solid rgb(211, 211, 211);
+        }
+
+        li>* {
+            margin: 0px 5px;
+        }
+
+        li p {
+            font-family: "Roboto", sans-serif;
+            padding: 5px 5px;
+        }
+
+        li button {
+            padding: 10px 10px;
+            border: none;
+            margin: 0px 5px;
+            border-radius: 5px;
+        }
+
+        li button:hover {
+            color: white;
+            background-color: black;
+            cursor: pointer;
+
+        }
+
+        li div {
+            margin: 9px 9px;
+        }
+
+        .download {
+            text-decoration: none;
+            color: black;
+            background-color: rgb(233, 233, 233);
+            padding: 10px 10px;
+            border-radius: 5px;
+        }
+
+        .download:hover {
+            background-color: black;
+            color: white;
+            cursor: pointer;
+        }
+
+        @media only screen and (max-width: 600px) {
+            body{
+                flex-direction: column;
+            }
+        }
+        .Textnothing{
+            display: none;
+        }
+        .Linknothing{
+            display: none;
+        }
+        .Filenothing{
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Link Items</h1>
+        <ul id="LINKUL">
+            {% for object in Linkitems %}
+            <li>
+                <a href="{{object.Link}}">
+                    <p>{{object.Link}}</P>
+                </a>
+                <div>
+                    <button data-ofobject="{{object.Link}}" class="copybtn">Copy</button>
+                    <button class="delbtn" data-name="{{object.Link}}" data-objecttype="Link">Delete</button>
+                </div>
+                {% endfor %}
+            </li>
+            <li class="Linknothing"><p>Nothing Here , Add Items</p></li>
+        </ul>
+    </div>
+
+
+    <div class="container">
+        <h1>Text Items</h1>
+        <ul id="TEXTUL">
+            {% for object in Textitems %}
+            <li>
+                <p>{{object.Text}}</p>
+                <div>
+                    <button data-ofobject="{{object.Text}}" class="copybtn">Copy</button>
+                    <button class="delbtn" data-name="{{object.Text}}" data-objecttype="Text">Delete</button>
+                </div>
+            </li>
+            {% endfor %}
+            <li class="Textnothing"><p>Nothing Here , Add Items </p></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h1>File Items</h1>
+        <ul id="FILEUL">
+        {% for object in Fileitems %}
+        <li>
+            <a href="media/{{object.File}}">View</a>
+            <div>
+                <a href="{{ object.File.url }}" download="{{ object.File.name }}" class="download">Download</a> <button
+                    class="delbtn" data-name="{{object.File}}" data-objecttype="File">Delete</button>
+            </div>
+        </li>
+        {% endfor %}
+        <li class="Filenothing"><p>Nothing Here , Add Items</p></li></ul>
+    </div>
+
+    <script>
+        document.querySelectorAll('.copybtn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var thingtocopy = button.getAttribute('data-ofobject');
+                navigator.clipboard.writeText(thingtocopy).then(function () {
+                    alert('item copied');
+                }).catch(function (error) {
+                    alert('Something went wrong ', error);
+                })
+
+            })
+        })
+    </script>
+    <script>
+        document.querySelectorAll('.delbtn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var name = button.getAttribute('data-name');
+                var objecttype = button.getAttribute('data-objecttype');
+                fetch('delitems', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/jason',
+                        'X-CSRFToken': '{{csrf_token}}'
+                    },
+                    body: JSON.stringify({ name, objecttype })
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.href = '/viewclipboard';
+                    } else {
+                        alert('Unable to delete');
+                    }
+                }).catch(error => {
+                    console.error('Error', error);
+                    alert("Error occured ", error);
+                })
+            })
+        })
+    </script>
+    <script>
+        if(document.getElementById("TEXTUL").childElementCount===1){
+            document.querySelector('.Textnothing').style.display = "block";
+        }
+        if(document.getElementById("LINKUL").childElementCount===1){
+            document.querySelector('.Linknothing').style.display = "block";
+        }
+        if(document.getElementById("FILEUL").childElementCount===1){
+            document.querySelector('.Filenothing').style.display = "block";
+        }
+    </script>
+
+</body>
+
+</html>
