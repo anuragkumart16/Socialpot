@@ -45,6 +45,7 @@ def viewclipboard(request):
     Linkitems = Linkmodel.objects.all()
     Textitems = Textmodel.objects.all()
     Fileitems = Filemodel.objects.all()
+    # messages.add_message(request,messages.ERROR,'Its working')
     return render(request , 'viewclipboard.html',{'Linkitems':Linkitems,'Textitems':Textitems,'Fileitems':Fileitems})
 
 

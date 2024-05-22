@@ -13,12 +13,13 @@
             padding: 0px 0px;
             box-sizing: border-box;
         }
-
-        body {
+        body{
+            flex-direction: column;
+        }
+        body , #main{
             /* align-items: center; */
             display: flex;
             justify-content: center;
-            flex-direction: row;
         }
 
         .container {
@@ -50,6 +51,8 @@
         li p {
             font-family: "Roboto", sans-serif;
             padding: 5px 5px;
+            overflow-wrap: break-word;
+            max-width: 50vw;
         }
 
         li button {
@@ -85,73 +88,120 @@
         }
 
         @media only screen and (max-width: 600px) {
-            body{
+            body {
+                flex-direction: column;
+            }
+            #main{
                 flex-direction: column;
             }
         }
-        .Textnothing{
+
+        .Textnothing {
             display: none;
         }
-        .Linknothing{
+
+        .Linknothing {
             display: none;
         }
-        .Filenothing{
+
+        .Filenothing {
             display: none;
+        }
+
+        .messageholder {
+            background-color: rgb(1, 104, 69);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100vw;
+            margin-top: 0px;
+
+        }
+
+        .messages {
+            list-style-type: none;
+            padding: 0px 5px;
+
+        }
+        .messages li{
+            padding: 0px 0px;
+            margin: 5px 0px;
+            background-color: rgb(1, 104, 69);
+            font-family: "Roboto", sans-serif;
+            color: white;
+            text-decoration: none;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Link Items</h1>
-        <ul id="LINKUL">
-            {% for object in Linkitems %}
-            <li>
-                <a href="{{object.Link}}">
-                    <p>{{object.Link}}</P>
-                </a>
-                <div>
-                    <button data-ofobject="{{object.Link}}" class="copybtn">Copy</button>
-                    <button class="delbtn" data-name="{{object.Link}}" data-objecttype="Link">Delete</button>
-                </div>
+    <div class="messageholder">
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
                 {% endfor %}
-            </li>
-            <li class="Linknothing"><p>Nothing Here , Add Items</p></li>
         </ul>
+        {% endif %}
     </div>
+    <div id="main">
+        <div class="container">
+            <h1>Link Items</h1>
+            <ul id="LINKUL">
+                {% for object in Linkitems %}
+                <li>
+                    <a href="{{object.Link}}">
+                        <p>{{object.Link}}</p>
+                    </a>
+                    <div>
+                        <button data-ofobject="{{object.Link}}" class="copybtn">Copy</button>
+                        <button class="delbtn" data-name="{{object.Link}}" data-objecttype="Link">Delete</button>
+                    </div>
+                    {% endfor %}
+                </li>
+                <li class="Linknothing">
+                    <p>Nothing Here , Add Items</p>
+                </li>
+            </ul>
+        </div>
 
 
-    <div class="container">
-        <h1>Text Items</h1>
-        <ul id="TEXTUL">
-            {% for object in Textitems %}
-            <li>
-                <p>{{object.Text}}</p>
-                <div>
-                    <button data-ofobject="{{object.Text}}" class="copybtn">Copy</button>
-                    <button class="delbtn" data-name="{{object.Text}}" data-objecttype="Text">Delete</button>
-                </div>
-            </li>
-            {% endfor %}
-            <li class="Textnothing"><p>Nothing Here , Add Items </p></li>
-        </ul>
+        <div class="container">
+            <h1>Text Items</h1>
+            <ul id="TEXTUL">
+                {% for object in Textitems %}
+                <li>
+                    <p>{{object.Text}}</p>
+                    <div>
+                        <button data-ofobject="{{object.Text}}" class="copybtn">Copy</button>
+                        <button class="delbtn" data-name="{{object.Text}}" data-objecttype="Text">Delete</button>
+                    </div>
+                </li>
+                {% endfor %}
+                <li class="Textnothing">
+                    <p>Nothing Here , Add Items </p>
+                </li>
+            </ul>
+        </div>
+
+        <div class="container">
+            <h1>File Items</h1>
+            <ul id="FILEUL">
+                {% for object in Fileitems %}
+                <li>
+                    <a href="media/{{object.File}}">View</a>
+                    <div>
+                        <a href="{{ object.File.url }}" download="{{ object.File.name }}" class="download">Download</a>
+                        <button class="delbtn" data-name="{{object.File}}" data-objecttype="File">Delete</button>
+                    </div>
+                </li>
+                {% endfor %}
+                <li class="Filenothing">
+                    <p>Nothing Here , Add Items</p>
+                </li>
+            </ul>
+        </div>
     </div>
-
-    <div class="container">
-        <h1>File Items</h1>
-        <ul id="FILEUL">
-        {% for object in Fileitems %}
-        <li>
-            <a href="media/{{object.File}}">View</a>
-            <div>
-                <a href="{{ object.File.url }}" download="{{ object.File.name }}" class="download">Download</a> <button
-                    class="delbtn" data-name="{{object.File}}" data-objecttype="File">Delete</button>
-            </div>
-        </li>
-        {% endfor %}
-        <li class="Filenothing"><p>Nothing Here , Add Items</p></li></ul>
-    </div>
-
     <script>
         document.querySelectorAll('.copybtn').forEach(function (button) {
             button.addEventListener('click', function () {
@@ -191,13 +241,13 @@
         })
     </script>
     <script>
-        if(document.getElementById("TEXTUL").childElementCount===1){
+        if (document.getElementById("TEXTUL").childElementCount === 1) {
             document.querySelector('.Textnothing').style.display = "block";
         }
-        if(document.getElementById("LINKUL").childElementCount===1){
+        if (document.getElementById("LINKUL").childElementCount === 1) {
             document.querySelector('.Linknothing').style.display = "block";
         }
-        if(document.getElementById("FILEUL").childElementCount===1){
+        if (document.getElementById("FILEUL").childElementCount === 1) {
             document.querySelector('.Filenothing').style.display = "block";
         }
     </script>
