@@ -61,11 +61,3 @@ def logoutview(request):
 
 # views.py
 
-from django.http import JsonResponse
-
-def check_username(request):
-    username = request.GET.get('username', None)
-    data = {
-        'is_taken': User.objects.filter(username__iexact=username).exists()
-    }
-    return JsonResponse(data)
