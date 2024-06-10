@@ -107,7 +107,7 @@
         .Filenothing {
             display: none;
         }
-
+/* 
         .messageholder {
             background-color: rgb(1, 104, 69);
             display: flex;
@@ -130,12 +130,31 @@
             font-family: "Roboto", sans-serif;
             color: white;
             text-decoration: none;
+        } */
+
+        .view {
+            color: white;
+            background-color: black;
+            border: none;
+            font-family: "Roboto", sans-serif;
+            padding: 10px 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 300;
         }
+
+        .holder {
+            margin-bottom: 70px;
+            padding: 10px 10px;
+            position: fixed;
+            bottom: 20px;
+        }
+        
     </style>
 </head>
 
 <body>
-    <div class="messageholder">
+    <!-- <div class="messageholder">
         {% if messages %}
         <ul class="messages">
             {% for message in messages %}
@@ -143,16 +162,16 @@
                 {% endfor %}
         </ul>
         {% endif %}
-    </div>
+    </div> -->
     <div id="main">
         <div class="container">
             <h1>Link Items</h1>
             <ul id="LINKUL">
                 {% for object in Linkitems %}
                 <li>
-                    <a href="{{object.Link}}">
-                        <p>{{object.Link}}</p>
-                    </a>
+                    
+                        <p class="link" data-link="{{object.Link}}">{{object.Link}}</p>
+                    
                     <div>
                         <button data-ofobject="{{object.Link}}" class="copybtn">Copy</button>
                         <button class="delbtn" data-name="{{object.Link}}" data-objecttype="Link">Delete</button>
@@ -201,6 +220,9 @@
                 </li>
             </ul>
         </div>
+    </div>
+    <div class="holder">
+        <a href="{% url 'logoutuser' %}" class="view">Logout</a>
     </div>
     <script>
         document.querySelectorAll('.copybtn').forEach(function (button) {

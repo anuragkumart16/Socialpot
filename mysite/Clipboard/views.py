@@ -4,9 +4,16 @@ from .models import *
 from django.http import JsonResponse
 import json
 from django.db import IntegrityError
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .serializers import LinkSerializers
 # Create your views here.
 def clipboard(request):
-    return render (request,'clipboard.html')
+    if request.user.is_authenticated:
+        return render (request,'clipboard.html')
+    else :
+        messages.add_message(request,messages.INFO,'please Login to view this page !')
+        return redirect('signinuser')
 
 def linkholder(request):
     if request.method=="POST":
@@ -71,3 +78,28 @@ def delitems(request):
             }
             return JsonResponse(response_data,status=400)
         return redirect('viewclipboard')
+    
+@api_view(['POST','GET','DELETE'])
+def apilink(request):
+    if request.method == 'POST':
+        data=request.data
+        serializer = LinkSerializers(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response (serializer.data)
+        else:
+            return Response(serializer.errors)
+    elif request.method == "GET":
+        obj = Linkmodel.objects.all()
+        serializer = LinkSerializers(obj,many=True)
+        return Response(serializer.data)
+    elif request.method == "DELETE":
+        data = request.data
+        print(data)
+        print(data['id'])
+        # obj = Linkmodel.objects.get(id=data['id'])
+        # obj.delete()
+        return Response({
+            "message" : "Link Deleted !"
+        })
+        

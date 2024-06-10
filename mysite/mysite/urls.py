@@ -15,20 +15,25 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from Members.views import *
+from django.urls import path,include
+from Members.views import home
 from Clipboard.views import *
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',home,name="home"),
+    path('members/',include("Members.urls")),
     path('clipboard',clipboard,name="clipboard"),
     path('textholder',textholder,name="textholder"),
     path('fileholder',fileholder,name="fileholder"),
     path('linkholder',linkholder,name="linkholder"),
     path('viewclipboard',viewclipboard,name='viewclipboard'),
     path('delitems',delitems,name='delitems'),
+    
+    # for hendeling api requests
+    path('api/',include('api.urls'))
     
 ]+ static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

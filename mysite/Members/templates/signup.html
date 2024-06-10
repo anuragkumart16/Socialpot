@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        *{
+            margin: 0px 0px;
+            padding: 0px 0px;
+            box-sizing: border-box;
+        }
+        main{
+            margin: 30px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px 20px;
+            box-shadow: 0px 0px 1px 0px;
+            width: fit-content;
+        }
+        main  div{
+            display: flex;
+            flex-direction: column;
+        }
+        main div > *{
+            padding: 10px 10px;
+        }
+        button {
+            color: white;
+            background-color: black;
+            border: none;
+        }
+        .messageholder {
+            background-color: rgb(1, 104, 69);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100vw;
+            margin-top: 0px;
+        }
+
+        .messages {
+            list-style-type: none;
+            padding: 10px 5px;
+
+        }
+        .messageholder > ul >li{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="messageholder">
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    <main>
+        <form action="signupuser" method="post" onsubmit="return ValidateForm()">
+            {% csrf_token %}
+            <h1>
+                Sign Up
+            </h1>
+            <div>
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email">
+                <label for="Username">Username</label>
+                <input type="text" name="username" id="username">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password">
+                <label >Already Have An Account ? <a href="{%url 'signinuser' %}">Sign In</a></label>
+                <button type="submit">Sign Up</button>
+            </div>
+        </form>
+    </main>
+    <script>
+         function ValidateForm(){
+            var emailinput = document.getElementById("email").value;
+            var usernameinput = document.getElementById("username").value;
+            var passwordinput = document.getElementById("password").value;
+            if (emailinput==""){
+                alert("email  Can't be empty !");
+                return false;
+            }
+            if(usernameinput==""){
+                alert("username cant be empty");
+                return false;
+            }
+            if(passwordinput==""){
+                alert("password cant be empty");
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>

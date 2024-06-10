@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Members',
     'Clipboard',
+    'api',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
