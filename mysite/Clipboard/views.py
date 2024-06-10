@@ -7,7 +7,9 @@ from django.db import IntegrityError
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import LinkSerializers
+
 # Create your views here.
+
 def clipboard(request):
     if request.user.is_authenticated:
         return render (request,'clipboard.html')
@@ -18,8 +20,9 @@ def clipboard(request):
 def linkholder(request):
     if request.method=="POST":
         Link=request.POST.get("Link")
+        user_obj = request.user.username
         try :
-            object=Linkmodel(Link=Link)
+            object=Linkmodel(Link=Link,user_obj=user_obj)
             object.save()
             messages.add_message(request,messages.INFO,'Link Was Saved !')
             return redirect('clipboard')
@@ -30,7 +33,8 @@ def linkholder(request):
 def fileholder(request):
     if request.method=="POST" :
         File=request.FILES.get("File")
-        object=Filemodel(File=File)
+        user_obj = request.user.username
+        object=Filemodel(File=File,user_obj=user_obj)
         object.save()
         messages.add_message(request,messages.INFO,'File Was Saved !')
         return redirect('clipboard')
@@ -38,8 +42,9 @@ def fileholder(request):
 def textholder(request):
     if request.method=="POST":
         Text=request.POST.get("Text")
+        user_obj = request.user.username
         try:
-            object=Textmodel(Text=Text)
+            object=Textmodel(Text=Text,user_obj=user_obj)
             object.save()
             messages.add_message(request,messages.INFO,'Text Was Saved !')
             return redirect('clipboard')
@@ -49,9 +54,9 @@ def textholder(request):
 
 
 def viewclipboard(request):
-    Linkitems = Linkmodel.objects.all()
-    Textitems = Textmodel.objects.all()
-    Fileitems = Filemodel.objects.all()
+    Linkitems = Linkmodel.objects.filter( user_obj = request.user.username)
+    Textitems = Textmodel.objects.filter(user_obj = request.user.username)
+    Fileitems = Filemodel.objects.filter(user_obj = request.user.username)
     # messages.add_message(request,messages.ERROR,'Its working')
     return render(request , 'viewclipboard.html',{'Linkitems':Linkitems,'Textitems':Textitems,'Fileitems':Fileitems})
 
@@ -61,16 +66,17 @@ def delitems(request):
         data = json.loads(request.body)
         name = data.get('name')
         objecttype = data.get('objecttype')
+        idname = data.get('idname')
         print(name)
         print(objecttype)
         if objecttype=="Text":
-            entry = Textmodel.objects.get(Text=name)
+            entry = Textmodel.objects.get(id=idname)
             entry.delete()
         elif objecttype =="File":
-            entry = Filemodel.objects.get(File=name)
+            entry = Filemodel.objects.get(id=idname)
             entry.delete()
         elif objecttype== "Link" :
-            entry = Linkmodel.objects.get(Link=name)
+            entry = Linkmodel.objects.get(id=idname)
             entry.delete()
         else :
             response_data = {

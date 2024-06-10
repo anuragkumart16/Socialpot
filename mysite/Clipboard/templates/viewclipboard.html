@@ -174,7 +174,7 @@
                     
                     <div>
                         <button data-ofobject="{{object.Link}}" class="copybtn">Copy</button>
-                        <button class="delbtn" data-name="{{object.Link}}" data-objecttype="Link">Delete</button>
+                        <button class="delbtn" data-name="{{object.Link}}" data-objecttype="Link" data-id="{{object.id}}">Delete</button>
                     </div>
                     {% endfor %}
                 </li>
@@ -193,7 +193,7 @@
                     <p>{{object.Text}}</p>
                     <div>
                         <button data-ofobject="{{object.Text}}" class="copybtn">Copy</button>
-                        <button class="delbtn" data-name="{{object.Text}}" data-objecttype="Text">Delete</button>
+                        <button class="delbtn" data-name="{{object.Text}}" data-objecttype="Text" data-id="{{object.id}}">Delete</button>
                     </div>
                 </li>
                 {% endfor %}
@@ -211,7 +211,7 @@
                     <a href="media/{{object.File}}">View</a>
                     <div>
                         <a href="{{ object.File.url }}" download="{{ object.File.name }}" class="download">Download</a>
-                        <button class="delbtn" data-name="{{object.File}}" data-objecttype="File">Delete</button>
+                        <button class="delbtn" data-name="{{object.File}}" data-objecttype="File" data-id="{{object.id}}">Delete</button>
                     </div>
                 </li>
                 {% endfor %}
@@ -221,9 +221,9 @@
             </ul>
         </div>
     </div>
-    <div class="holder">
+    {% comment %} <div class="holder">
         <a href="{% url 'logoutuser' %}" class="view">Logout</a>
-    </div>
+    </div> {% endcomment %}
     <script>
         document.querySelectorAll('.copybtn').forEach(function (button) {
             button.addEventListener('click', function () {
@@ -242,13 +242,14 @@
             button.addEventListener('click', function () {
                 var name = button.getAttribute('data-name');
                 var objecttype = button.getAttribute('data-objecttype');
+                var idname = button.getAttribute('data-id');
                 fetch('delitems', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/jason',
                         'X-CSRFToken': '{{csrf_token}}'
                     },
-                    body: JSON.stringify({ name, objecttype })
+                    body: JSON.stringify({ name, objecttype ,idname })
                 }).then(response => {
                     if (response.ok) {
                         window.location.href = '/viewclipboard';

@@ -59,5 +59,6 @@ def logoutview(request):
     return redirect('signinuser')
 
 
-# views.py
+def changepassword(request):
+    pass
 
