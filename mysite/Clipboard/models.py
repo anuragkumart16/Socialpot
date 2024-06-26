@@ -12,6 +12,7 @@ class Textmodel(models.Model):
 
 class Filemodel(models.Model):
     File = models.FileField(upload_to="uploads/")
+    Filename=models.CharField(max_length=200,default=None)
     user_obj = models.CharField(max_length=100,default='none')
     def delete(self, *args, **kwargs):
         # Delete the file from the filesystem

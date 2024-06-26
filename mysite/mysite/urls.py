@@ -20,6 +20,7 @@ from Members.views import home
 from Clipboard.views import *
 from django.conf import settings
 from django.conf.urls.static import static
+from otphandler.views import otprequest
 
 
 urlpatterns = [
@@ -34,6 +35,7 @@ urlpatterns = [
     path('delitems',delitems,name='delitems'),
     
     # for hendeling api requests
-    path('api/',include('api.urls'))
+    path('api/',include('api.urls')),
+    path('otphandler',otprequest.as_view(),name="otp"),
     
 ]+ static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
