@@ -14,17 +14,16 @@ class otprequest(APIView):
     def post(self,request):
         # getting the data needed
         data = request.data
-        print(data)
         serializer = OtprequestSerializer(data=data)
         if not serializer.is_valid():
             return Response({
                 'status': False,
-                'message' : 'something went wrong and its from frontend'
+                'message' : 'Something went wrong'
             },status.HTTP_400_BAD_REQUEST)
         
         email = data['email']
         global otp
-        otp= random.randint(0000,9999)
+        otp= random.randint(1000,9999)
 
         # Email account credentials
         from_address = "acrossdevice01@gmail.com"
@@ -55,7 +54,7 @@ class otprequest(APIView):
 
         return Response({
             'status':True,
-            'message':'otp succesfully sent',
+            'message':'Otp succesfully sent',
             'otp': f'{otp}'
         },status.HTTP_200_OK)
 
