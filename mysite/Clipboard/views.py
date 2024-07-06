@@ -4,10 +4,11 @@ from .models import *
 from django.http import JsonResponse
 import json
 from django.db import IntegrityError
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import LinkSerializers ,TextSerializers ,FileSerializers
-
+from rest_framework.views import APIView
+from .serializers import LinkSerializers ,TextSerializers ,FileSerializers, AnotherTextSerializers, AnotherLinkSerializers
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 
 def clipboard(request):
@@ -22,7 +23,7 @@ def linkholder(request):
         Link=request.POST.get("Link")
         user_obj = request.user.username
         try :
-            object=Linkmodel(Link=Link,user_obj=user_obj)
+            object=Linkmodel(Link=Link,user = user_obj)
             object.save()
             messages.add_message(request,messages.INFO,'Link Was Saved !')
             return redirect('clipboard')
@@ -87,51 +88,77 @@ def delitems(request):
     
 
     
-@api_view(['POST','GET','DELETE'])
-def apilink(request):
-    if request.method == 'POST':
-        data=request.data
+class linkhandler(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        data = request.data
         serializer = LinkSerializers(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response (serializer.data)
-        else:
-            return Response(serializer.errors)
-    elif request.method == "GET":
-        obj = Linkmodel.objects.all()
-        serializer = LinkSerializers(obj,many=True)
-        return Response(serializer.data)
-    elif request.method == "DELETE":
-        data = request.data
-        print(data)
-        print(data['id'])
-        obj = Linkmodel.objects.filter(id=data['id'])
-        obj.delete()
+        if not serializer.is_valid():
+            return Response({
+                'status' : 400,
+                'message':'Bad request, invaild Item given',
+            },status.HTTP_400_BAD_REQUEST)
+        print(serializer.data)
+        instance = Linkmodel(Link = serializer.data['Link'],user= request.user.username)
+        instance.save()
         return Response({
-            "message" : "Link Deleted !"
-        })
+            'status' : 200,
+            'message' : 'link Stored Successfully',
+        },status.HTTP_200_OK)
 
-@api_view(['POST','GET','DELETE'])        
-def apitext(request):
-    if request.method == "POST":
-        data = request.data
-        serializer = TextSerializers
-        if serializer.is_valid():
-            serializer.save()
-            return Response (serializer.data)
-        else:
-            return Response(serializer.errors)
-    elif request.method == "GET":
-        obj = Textmodel.objects.all()
-        serializer = TextSerializers(obj,many=True)
-        return Response(serializer.data)
-    elif request.method == "DELETE":
-        data = request.data
-        print(data)
-        print(data['id'])
-        obj = Linkmodel.objects.filter(id=data['id'])
-        obj.delete()
+    def get(self,request):
+        obj = Linkmodel.objects.filter(user=request.user.username)
+        serializer = AnotherLinkSerializers(obj,many=True)
         return Response({
-            "message" : "Link Deleted !"
-        })
+            'status':200,
+            'message':'Fetch Successful',
+            'data':serializer.data
+        },status.HTTP_200_OK)
     
+    def delete(self,request):
+        data = request.data
+        instance = Linkmodel.objects.get(id=data['id'])
+        instance.delete()
+        return Response({
+            'status':200,
+            'message': 'Link deleted'
+        },status.HTTP_200_OK)
+
+
+
+class texthandler(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        data = request.data
+        serializer = TextSerializers(data=data)
+        if not serializer.is_valid():
+            return Response({
+                'status' : 400,
+                'message':'Bad request, invaild Item given',
+            },status.HTTP_400_BAD_REQUEST)
+
+        instance = Textmodel(Text = serializer.data['Text'],user = request.user.username)    
+        instance.save()
+        return Response({
+            'status' : 200,
+            'message' : 'Text Stored Successfully',
+        },status.HTTP_200_OK)
+
+    def get(self,request):
+        obj = Textmodel.objects.filter(user=request.user.username)
+        serializer = AnotherTextSerializers(obj,many=True)
+        return Response({
+            'status':200,
+            'message':'Fetch Successful',
+            'data':serializer.data
+        },status.HTTP_200_OK)
+    
+    def delete(self,request):
+        data = request.data
+        instance = Textmodel.objects.get(id=data['id'])
+        instance.delete()
+        return Response({
+            'status':200,
+            'message': 'Text deleted'
+        },status.HTTP_200_OK)
+

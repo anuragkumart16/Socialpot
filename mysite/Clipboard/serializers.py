@@ -1,13 +1,19 @@
 from . models import Linkmodel,Textmodel,Filemodel
 from rest_framework import serializers
 
-class LinkSerializers(serializers.ModelSerializer):
-    class Meta :
+class LinkSerializers(serializers.Serializer):
+    Link = serializers.CharField()
+    
+class AnotherLinkSerializers(serializers.ModelSerializer):
+    class Meta:
         model = Linkmodel
         fields = '__all__'
 
-class TextSerializers(serializers.ModelSerializer):
-    class Meta :
+class TextSerializers(serializers.Serializer):
+    Text = serializers.CharField()
+
+class AnotherTextSerializers(serializers.ModelSerializer):
+    class Meta:
         model = Textmodel
         fields = '__all__'
 

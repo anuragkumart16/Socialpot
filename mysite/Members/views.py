@@ -5,10 +5,11 @@ from .models import *
 from django.contrib import messages
 from django.db import IntegrityError
 from rest_framework.decorators import api_view
-from .serializers import UsernameSerializer, EmailSerializer ,RegisterSerializers 
+from .serializers import UsernameSerializer, EmailSerializer ,UserSerializer 
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 
 def home(request):
@@ -114,22 +115,15 @@ def checkemail(request):
 
 
 # api for creating a user
-class usercreationapi(APIView):
-    def post(self,request):
-        data = request.data
-        serializer = RegisterSerializers(data=data)
-
-        if not serializer.is_valid():
-            return Response({
-                'status':False,
-                'message':'Serializer.error'
-            },status.HTTP_400_BAD_REQUEST)
-        
-        serializer.save()
+class getuserdetails(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        serializer = UserSerializer(request.user)
         return Response({
-            'status':True,
-            'message':'User created! Logging you in...'
-        },status.HTTP_201_CREATED)
-        
+            'status':200,
+            'message':'user details fetch successful',
+            'username': serializer.data['username'],
+            'email': serializer.data['email']
+        })
 
 
