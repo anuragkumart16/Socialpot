@@ -29,5 +29,6 @@ urlpatterns = [
     path('tokenrefresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('linkhandler',linkhandler.as_view(),name='linkhandler'),
     path('texthandler',texthandler.as_view(),name='texthandler'),
+    path('filehandler',filehandler.as_view(),name ='filehandler'),
 
 ]+ static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

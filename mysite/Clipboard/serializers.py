@@ -21,3 +21,7 @@ class FileSerializers(serializers.ModelSerializer):
     class Meta :
         model = Filemodel
         fields = '__all__'
+
+class AnotherFileSerializers(serializers.Serializer):
+    File= serializers.FileField()
+    Filename = serializers.CharField()

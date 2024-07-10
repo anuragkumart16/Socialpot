@@ -6,7 +6,7 @@ import json
 from django.db import IntegrityError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import LinkSerializers ,TextSerializers ,FileSerializers, AnotherTextSerializers, AnotherLinkSerializers
+from .serializers import LinkSerializers ,TextSerializers ,FileSerializers, AnotherTextSerializers, AnotherFileSerializers, AnotherLinkSerializers
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 # Create your views here.
@@ -92,11 +92,13 @@ class linkhandler(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request):
         data = request.data
+        print(data)
         serializer = LinkSerializers(data=data)
         if not serializer.is_valid():
             return Response({
                 'status' : 400,
                 'message':'Bad request, invaild Item given',
+                'details':serializer.errors
             },status.HTTP_400_BAD_REQUEST)
         print(serializer.data)
         instance = Linkmodel(Link = serializer.data['Link'],user= request.user.username)
@@ -162,3 +164,35 @@ class texthandler(APIView):
             'message': 'Text deleted'
         },status.HTTP_200_OK)
 
+class filehandler(APIView):
+    permission_classes =[IsAuthenticated]
+    def post (self,request):
+        serializer = AnotherFileSerializers(data = request.data)
+        if serializer.is_valid():
+            instance = Filemodel(user_obj=request.user.username,File= serializer.data['File'], Filename = serializer.data['Filename'])
+            instance.save()
+            return Response({
+                'status':200,
+                'message':'The file is uploaded'
+            },status.HTTP_200_OK)
+        else:
+            return Response({
+            'status':400,
+            'message':'Invalid Value Entered'
+            },status.HTTP_400_BAD_REQUEST)
+    def get(self,request):
+        data = Filemodel.objects.filter(user_obj=request.user.username)
+        serializer = FileSerializers(data , many=True)
+        return Response({
+            'status':200,
+            'message':'fetch Successful',
+            'data': serializer.data
+        },status.HTTP_200_OK)
+    def delete(self,request):
+        data = request.data
+        instance = Filemodel.objects.get(id = data['id'])
+        instance.delete()
+        return Response({
+            'status':200,
+            'message': 'Item Deleted'
+        },status.HTTP_200_OK)
