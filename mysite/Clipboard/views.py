@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from .serializers import LinkSerializers ,TextSerializers ,FileSerializers, AnotherTextSerializers, AnotherFileSerializers, AnotherLinkSerializers
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 # Create your views here.
 
 def clipboard(request):
@@ -166,11 +167,13 @@ class texthandler(APIView):
 
 class filehandler(APIView):
     permission_classes =[IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
     def post (self,request):
-        serializer = AnotherFileSerializers(data = request.data)
+        data = request.data.copy()
+        data['user_obj'] = request.user.username
+        serializer = FileSerializers(data = data)
         if serializer.is_valid():
-            instance = Filemodel(user_obj=request.user.username,File= serializer.data['File'], Filename = serializer.data['Filename'])
-            instance.save()
+            serializer.save()
             return Response({
                 'status':200,
                 'message':'The file is uploaded'
@@ -180,6 +183,7 @@ class filehandler(APIView):
             'status':400,
             'message':'Invalid Value Entered'
             },status.HTTP_400_BAD_REQUEST)
+
     def get(self,request):
         data = Filemodel.objects.filter(user_obj=request.user.username)
         serializer = FileSerializers(data , many=True)
@@ -188,6 +192,7 @@ class filehandler(APIView):
             'message':'fetch Successful',
             'data': serializer.data
         },status.HTTP_200_OK)
+    
     def delete(self,request):
         data = request.data
         instance = Filemodel.objects.get(id = data['id'])
