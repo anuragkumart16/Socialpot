@@ -6,8 +6,6 @@ class Linkmodel(models.Model):
     Link = models.TextField(max_length=10000)
     user = models.CharField(max_length=200)
 
-    
-
 class Textmodel(models.Model):
     Text = models.TextField(max_length=1000)
     user = models.CharField(max_length=100,null=False)

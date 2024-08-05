@@ -1,9 +1,5 @@
-from django.shortcuts import render,redirect
-from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .models import *
-from django.contrib import messages
-from django.db import IntegrityError
 from rest_framework.decorators import api_view
 from .serializers import UsernameSerializer, EmailSerializer ,UserSerializer 
 from rest_framework.response import Response
@@ -12,60 +8,70 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 
-def home(request):
-    return redirect('signinuser')
-    
-
-def signinview(request):
-    if request.method == 'POST':
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        user = authenticate(username =username ,password = password)
-        if user is not None:
-            login(request,user)
-            messages.add_message(request,messages.INFO,'Login Sucessful !')
-            return redirect ('clipboard')
+class Member(APIView):
+    def post (self,request):
+        data = request.data
+        serializer = UserSerializer(data = data)
+        if not serializer.is_valid():
+            return Response({
+                'status': 400,
+                'message':serializer.errors
+            },status.HTTP_400_BAD_REQUEST)
         else:
-            messages.add_message(request,messages.INFO,'invalid Credentials !')
-            return render(request,'signin.html')
-    else: 
-        return render(request,'signin.html')
-
-def signupview(request):
-    if request.method == "POST":
-        username= request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        try :
-            user = User.objects.create_user(username,email,password)
-            user.save()
-            user=authenticate(username=username,password=password)
-            if user is not None:
-                login(request,user)
-                messages.add_message(request,messages.INFO,'Account Sucessfully Created !')
-                return redirect ('clipboard')
-        except IntegrityError :
-            messages.add_message(request,messages.ERROR,'Username already taken !')
-            return redirect('signupuser')
-
-        user.save()
-        user=authenticate(username=username,password=password)
+            instance = User.objects.create(username = data['username'],email = data['email'])
+            instance.set_password(data['password'])
+            instance.save()
+            return Response({
+                'status' : 201,
+                'message':'User Creation Successful'
+            },status.HTTP_201_CREATED)
+    
+    def get (self,request):
+        self.permission_classes = [IsAuthenticated]
+        self.check_permissions(request)
+        obj = User.objects.all()
+        serializer = UserSerializer(obj,many=True)
+        return Response({
+            'status':200,
+            'message':'Fetch Successful',
+            'data' : serializer.data
+        },status.HTTP_200_OK)
+    
+    def delete(self,request):
+        self.permission_classes = [IsAuthenticated]
+        self.check_permissions(request)
+        user_name = request.user.username
+        instance = User.objects.get(username = user_name)
+        instance.delete()
+        return Response({
+            'status':200,
+            'message':'User Deleted Successfully'
+        },status.HTTP_200_OK)
+    
+    def patch(self,request):
+        self.permission_classes = [IsAuthenticated]
+        self.check_permissions(request)
+        username = request.user.username
+        password = request.data['password']
+        user = authenticate(username = username,password = password)
         if user is not None:
-            login(request,user)
-            messages.add_message(request,messages.INFO,'Account Sucessfully Created !')
-            return redirect ('clipboard')
-    else:
-        return render(request,'signup.html')
+            id = request.data['id']
+            instance = User.objects.get(id = id)
+            if request.data['type'] == 'username':
+                instance.username = request.data['username']
+            elif request.data['type'] == 'email':
+                instance.email = request.data['email']
+            instance.save()
+            return Response({
+                'status': 200,
+                'message': 'Update Successful'
+            },status.HTTP_200_OK)
+        else:
+            return Response({
+                'status':401,
+                'message':'Invalid Username or Password'
+            },status.HTTP_401_UNAUTHORIZED)
         
-
-def logoutview(request):
-    logout(request)
-    messages.add_message(request,messages.INFO,' logout Successful !')
-    return redirect('signinuser')
-
-
-def changepassword(request):
-    pass
 
 # api for checking username availability
 @api_view(['POST'])
@@ -126,4 +132,18 @@ class getuserdetails(APIView):
             'email': serializer.data['email']
         })
 
+class changepassword(APIView):
+    def post(self,request):
+        username = request.data['email']
+        password = request.data['password']
 
+        instance = User.objects.get(email = username)
+        instance.set_password(password)
+        instance.save()
+
+        return Response({
+            'status':200,
+            'message':'Password Updated Successfully'
+        })
+
+        
