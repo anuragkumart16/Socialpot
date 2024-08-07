@@ -14,6 +14,7 @@ urlpatterns = [
     
     # for handling api requests
     path('collab',CollaborationAPI.as_view(),name='collab'),
+    path('collabmessage',CollabMessageAPI.as_view(),name='collabmessage'),
     path('collabmember',CollabMembersAPI.as_view(),name='collabmembers'),
     path('collabdata',CollabDataAPI.as_view(),name='collabdata'),
     path('members',Member.as_view(),name="createuser"),

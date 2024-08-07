@@ -17,7 +17,7 @@ class CollabData (models.Model):
     MemberName = models.CharField(max_length=200,null=False)
     SharingTime = models.DateTimeField(auto_now_add=True)
     DataType = models.CharField(max_length=10)
-    Link = models.FileField(upload_to="uploads/",null=True,blank=True)
+    Link = models.FileField(upload_to="uploads/collab",null=True,blank=True)
     Data = models.CharField(null=True,max_length=1000,blank=True)
     Comment = models.CharField(max_length=200,null=True,blank=True)
     def delete(self, *args, **kwargs):

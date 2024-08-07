@@ -155,43 +155,136 @@ class CollabMembersAPI(APIView):
             instance.save()
         return Response({
             'status':200,
-            'message':'Collab Members Updated',
+            'message':'Username In Collaborations Updated...',
             'instance':data
         },status.HTTP_200_OK)
     
 
 class CollabDataAPI(APIView):
     permission_classes =[IsAuthenticated]
-    # parser_classes = (MultiPartParser,FormParser)
+    parser_classes = (MultiPartParser,FormParser)
+
+    def post(self, request):
+            try:
+                data = request.data.copy()
+                data['MemberName'] = request.user.username
+                serializer = CollabDataSerializer(data=data)
+
+                if not serializer.is_valid():
+                    return Response({
+                        'status': 400,
+                        'message': serializer.errors,
+                        'instance': serializer.data
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                serializer.save()
+
+                try:
+                    obj = CollabData.objects.all()
+                    getserializer = CollabDataSerializer(obj, many=True)
+                except UnicodeDecodeError:
+                    print('This part was giving error')
+                
+                return Response({
+                    'status': 200,
+                    'message': 'Instance Created Successfully',
+                    'instance': serializer.data,
+                    'data': getserializer.data
+                }, status=status.HTTP_200_OK)
+
+            except UnicodeDecodeError:
+                print('The whole API is working')
+    
+    def get(self,request):
+        data = request.data
+        obj = CollabData.objects.filter(CollabName = data['CollabName'])
+        serializer = CollabDataSerializer(obj,many=True)
+        return Response({
+            'status':200,
+            'message':'Fetch Successful',
+            'data':serializer.data
+        },status.HTTP_200_OK)
+    
+    def delete(self,request):
+        data = request.data
+        instance = CollabData.objects.get(id = data['id'])
+        instance.delete()
+        obj = CollabData.objects.filter(CollabName = data['CollabName'])
+        serializer = CollabDataSerializer(obj,many=True)
+        return Response({
+            'status':200,
+            'message':'Instance Delted Successfully',
+            'data':serializer.data
+        },status.HTTP_200_OK)
+    
+    def patch(self,request):
+        data = request.data
+        instances = CollabMembers.objects.filter(CollabMembers = request.user.username)
+        print(instances)
+        for instance in instances:
+            instance.MemberName = data['new_username']
+            instance.save()
+        return Response({
+            'status':200,
+            'message':'Username In Collab Data is Updated...',
+            'instance':data
+        },status.HTTP_200_OK)
+    
+    
+class CollabMessageAPI(APIView):
+    permission_classes=[IsAuthenticated]
 
     def post(self,request):
         data = request.data.copy()
         data['MemberName'] = request.user.username
-        serializer = CollabDataSerializer(data=data)
-        if not serializer.is_valid():
+        serializer = CollabMessagesSerializer(data=data)
+        obj = CollabMessages.objects.filter(CollabName = data['CollabName'])
+        getserializer = CollabMessagesSerializer(obj,many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'status':200,
+                'message':'Message Saved Successfully',
+                'data': getserializer.data
+            },status.HTTP_200_OK)
+        else:
             return Response({
                 'status':400,
-                'message':serializer.errors,
-                'intance':serializer.data
+                'message':'Invalid Data Sent',
+                'data': getserializer.data
             },status.HTTP_400_BAD_REQUEST)
-        else:
-            try:
-                serializer.save()
-                obj = CollabData.objects.all()
-                getserializer = CollabDataSerializer(obj,many=True)
-            except UnicodeDecodeError:
-                return Response({
-                    'status':200,
-                    'message':'Instance Created Successfully',
-                    'instance':data,
-                    # 'data':getserializer.data
-                },status.HTTP_200_OK)
-            else:
-                # obj = CollabData.objects.all()
-                # getserializer = CollabDataSerializer(obj,many=True)
-                return Response({
-                    'status':200,
-                    'message':'Instance Created Successfully',
-                    'instance':data,
-                    'data':getserializer.data
-                },status.HTTP_200_OK)
+    
+    def get(self,request):
+        data = request.data
+        obj = CollabMessages.objects.filter(CollabName = data['CollabName'])
+        getserializer = CollabMessagesSerializer(obj,many=True)
+        return Response({
+                'status':200,
+                'message':'Messages Fetched Successfully',
+                'data': getserializer.data
+            },status.HTTP_200_OK)
+    
+    def delete(self,request):
+        data = request.data
+        instance = CollabMessages.objects.get(id = data['id'])
+        instance.delete()
+        obj = CollabMessages.objects.filter(CollabName = data['CollabName'])
+        getserializer = CollabMessagesSerializer(obj,many=True)
+        return Response({
+                'status':200,
+                'message':'Messages Deleted Successfully',
+                'data': getserializer.data
+            },status.HTTP_200_OK)
+        
+    def patch(self,request):
+        data = request.data
+        instances = CollabMessages.objects.filter(CollabMembers = request.user.username)
+        print(instances)
+        for instance in instances:
+            instance.MemberName = data['new_username']
+            instance.save()
+        return Response({
+            'status':200,
+            'message':'Username is Messages is Updated...',
+            'instance':data
+        },status.HTTP_200_OK)
