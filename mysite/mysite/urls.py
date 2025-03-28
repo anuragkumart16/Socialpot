@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from Members.views import *
+from Members.views import Home
 from Clipboard.views import *
 from django.conf import settings
 from django.conf.urls.static import static
@@ -11,7 +12,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
+    path('',Home,name='home'),
     # for handling api requests
     path('collab',CollaborationAPI.as_view(),name='collab'),
     path('collabmessage',CollabMessageAPI.as_view(),name='collabmessage'),
