@@ -7,6 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from .serializers import OtprequestSerializer
 
+
 # Create your views here.
 
 class otprequest(APIView):
@@ -27,7 +28,7 @@ class otprequest(APIView):
 
         # Email account credentials
         from_address = "acrossdevice01@gmail.com"
-        password = "bapw oify vutv fuau"
+        password = "sjcv polf fwli yoxn"
 
         # send email to 
         to_address = email
