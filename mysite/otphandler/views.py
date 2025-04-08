@@ -1,67 +1,43 @@
 from rest_framework.views import APIView
-from rest_framework import status
 from rest_framework.response import Response
+from rest_framework import status
+from django.core.mail import send_mail
 import random
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from .serializers import OtprequestSerializer
 
 
-# Create your views here.
-
 class otprequest(APIView):
-    
-    def post(self,request):
-        # getting the data needed
-        data = request.data
-        serializer = OtprequestSerializer(data=data)
+    def post(self, request):
+        serializer = OtprequestSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response({
-                'status': False,
-                'message' : 'Something went wrong'
-            },status.HTTP_400_BAD_REQUEST)
-        
-        email = data['email']
-        global otp
-        otp= random.randint(1000,9999)
+            return Response(
+                {"status": False, "message": "Invalid data"},
+                status.HTTP_400_BAD_REQUEST,
+            )
 
-        # Email account credentials
-        from_address = "acrossdevice01@gmail.com"
-        password = "sjcv polf fwli yoxn"
+        email = serializer.validated_data["email"]
+        otp = random.randint(1000, 9999)
 
-        # send email to 
-        to_address = email
-
-        # Email content
         subject = "Verify Otp for Across Device"
-        body = f"your otp for email verification is {otp} ."
+        message = f"""
+Hello,
 
-        msg = MIMEMultipart()
-        msg['From'] = from_address
-        msg['To'] = to_address
-        msg['Subject'] = subject
+Your OTP for verifying your email on Across Device is: {otp}
 
-        # Attach the body with the msg instance
-        msg.attach(MIMEText(body, 'plain'))
+If you didn’t request this, please ignore the email.
 
-        # Create server object with SSL option
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        
-        server.login(from_address, password)
-        server.sendmail(from_address, to_address, msg.as_string())
-        server.quit()
+Thank you,
+Across Device Team
+"""
+        send_mail(
+            subject,
+            message,
+            "acrossdevice01@gmail.com",  # From email
+            [email],  # To email list
+            fail_silently=False,
+        )
 
-        return Response({
-            'status':True,
-            'message':'Otp succesfully sent',
-            'otp': f'{otp}'
-        },status.HTTP_200_OK)
-
-
-
-
-        
-
-
+        return Response(
+            {"status": True, "message": "OTP sent successfully", "otp": otp},
+            status.HTTP_200_OK,
+        )

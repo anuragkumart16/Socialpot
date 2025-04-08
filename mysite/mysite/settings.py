@@ -166,3 +166,13 @@ SIMPLE_JWT = {
 # settings.py
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
+
+
+# settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'acrossdevice01@gmail.com'
+EMAIL_HOST_PASSWORD = "sjcv polf fwli yoxn"  # App password here
